@@ -4,19 +4,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storages.FilmStorage;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @Slf4j
 public class FilmController {
-    private int id = 1;
-    private final Map<Integer, Film> films = new HashMap<>();
+    Map<Integer, Film> films = FilmStorage.getStorage();
     private static final LocalDate FIRST_FILM_RELEASE = LocalDate.of(1895, 12, 28);
 
     @PostMapping("/films")
@@ -27,7 +26,7 @@ public class FilmController {
         if (film.getReleaseDate().isBefore(FIRST_FILM_RELEASE)) {
             throw new ValidationException("Неверная дата релиза");
         }
-        film.setId(id++);
+        film.setId(FilmStorage.generateID());
         films.put(film.getId(), film);
         log.info("Получен запрос POST /films. Фильм с id {} добавлен.", film.getId());
         return film;

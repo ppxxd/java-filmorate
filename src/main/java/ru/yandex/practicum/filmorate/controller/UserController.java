@@ -4,19 +4,18 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storages.UserStorage;
 
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @Slf4j
 public class UserController {
-    private int id = 1;
-    private final Map<Integer, User> users = new HashMap<>();
+    Map<Integer, User> users = UserStorage.getStorage();
 
     @PostMapping("/users")
     public User add(@Valid @RequestBody User user) {
@@ -26,7 +25,7 @@ public class UserController {
         if (user.getName() == null) {
             user.setName(user.getLogin());
         }
-        user.setId(id++);
+        user.setId(UserStorage.generateID());
         users.put(user.getId(), user);
         log.info("Получен запрос POST /users. Пользователь с id {} добавлен.", user.getId());
         return user;

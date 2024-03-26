@@ -23,8 +23,6 @@ public class Film {
     @NonNull
     private String description;
     @NonNull
-//    @JsonDeserialize(using = LocalDateDeserializer.class)
-//    @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate releaseDate;
     @Positive
     private int duration;
