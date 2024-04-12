@@ -49,8 +49,8 @@ public class FilmService {
 
     public List<Film> getMostPopular(int count) {
         return storage.getStorage().values().stream()
-                .sorted(Comparator.comparingInt(Film::getLikesAmount).reversed()).
-                limit(count).collect(Collectors.toList());
+                .sorted(Comparator.comparingInt(Film::getLikesAmount).reversed())
+                .limit(count).collect(Collectors.toList());
     }
 
     public  Film createFilm(Film film) throws ValidationException {
