@@ -28,7 +28,7 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private int duration;
-    final Set<Integer> likes = new HashSet<>();
+    private final Set<Integer> likes = new HashSet<>();
 
     public int getLikesAmount() {
         return likes.size();
