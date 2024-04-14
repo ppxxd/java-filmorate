@@ -1,50 +1,65 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storages.FilmStorage;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @Slf4j
+@RequestMapping("/films")
 public class FilmController {
-    Map<Integer, Film> films = FilmStorage.getStorage();
-    private static final LocalDate FIRST_FILM_RELEASE = LocalDate.of(1895, 12, 28);
+    private final FilmService filmService;
 
-    @PostMapping("/films")
+    @Autowired
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
+    }
+
+    @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) throws ValidationException {
-        if (films.containsKey(film.getId())) {
-            throw new ValidationException("Фильм с таким id уже существует.");
-        }
-        if (film.getReleaseDate().isBefore(FIRST_FILM_RELEASE)) {
-            throw new ValidationException("Неверная дата релиза");
-        }
-        film.setId(FilmStorage.generateID());
-        films.put(film.getId(), film);
         log.info("Получен запрос POST /films. Фильм с id {} добавлен.", film.getId());
-        return film;
+        return filmService.createFilm(film);
     }
 
-    @PutMapping("/films")
-    public Film updateFilm(@Valid @RequestBody Film film) throws ValidationException {
-        if (!films.containsKey(film.getId())) {
-            throw new ValidationException("Фильма с таким id не существует.");
-        }
-        films.put(film.getId(), film);
+    @PutMapping
+    public Film updateFilm(@Valid @RequestBody Film film) throws FilmNotFoundException {
         log.info("Получен запрос PUT /films. Фильм с id {} обновлен.", film.getId());
-        return film;
+        return filmService.updateFilm(film);
     }
 
-    @GetMapping("/films")
+    @GetMapping
     public List<Film> findAll() {
         log.info("Получен запрос GET /films.");
-        return new ArrayList<>(films.values());
+        return filmService.findAll();
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public Film likeFilm(@PathVariable int id, @PathVariable int userId) throws FilmNotFoundException,
+            UserNotFoundException {
+        log.info("Получен запрос PUT /films/{id}/like/{userId}. " +
+                "Пользователь {} поставил лайк к фильму {}.", id, userId);
+        return filmService.likeFilm(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public Film unlikeFilm(@PathVariable int id, @PathVariable int userId)
+            throws FilmNotFoundException, UserNotFoundException {
+        log.info("Получен запрос PUT /films/{id}/like/{userId}. " +
+                "Пользователь {} убрал лайк к фильму {}.", id, userId);
+        return filmService.unlikeFilm(id, userId);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getMostPopular(@RequestParam(defaultValue = "10") int count) {
+        log.info("Получен запрос PUT /films/{id}/like/{userId}. Запрошен список {} популярных фильмов.", count);
+        return filmService.getMostPopular(count);
     }
 }
