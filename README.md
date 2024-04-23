@@ -1,6 +1,6 @@
 # java-filmorate
 
-![diagram](diagram.png)
+![diagram](src/main/resources/diagram.png)
 
 ## CRUD-операции для базы данных такого типа
 - Получить список всех пользователей

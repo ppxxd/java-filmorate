@@ -1,8 +1,9 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.inmemory;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -23,7 +24,7 @@ public class UserService {
     private static int id = 1;
 
     @Autowired
-    public UserService(UserStorage storage) {
+    public UserService(@Qualifier("inMemoryUserStorage") UserStorage storage) {
         this.storage = storage;
     }
 
@@ -50,12 +51,12 @@ public class UserService {
                 .collect(Collectors.toList());
         List<User> mutualFriendObjects = new ArrayList<>();
         mutualFriendsIDs
-                .forEach(friendsId -> mutualFriendObjects.add(storage.getStorage().get(friendsId)));
+                .forEach(friendsId -> mutualFriendObjects.add(storage.getUserByID(friendsId)));
         return mutualFriendObjects;
     }
 
     public User createUser(User user) {
-        if (storage.getStorage().containsKey(user.getId())) {
+        if (storage.getUserByID(user.getId()) == null) {
             throw new ValidationException("Пользователь с таким id уже существует.");
         }
         if (user.getName() == null || user.getName().isBlank()) {
@@ -70,7 +71,7 @@ public class UserService {
     }
 
     public User updateUser(User user) throws UserNotFoundException {
-        if (!storage.getStorage().containsKey(user.getId())) {
+        if (storage.getUserByID(user.getId()) == null) {
             throw new UserNotFoundException("Пользователь с таким id не существует.");
         }
         if (user.getName() == null || user.getName().isBlank()) {
@@ -88,13 +89,13 @@ public class UserService {
     }
 
     public List<User> findAll() {
-        return new ArrayList<>(storage.getStorage().values());
+        return new ArrayList<>(storage.getUsers());
     }
 
     public List<User> getUserFriends(Integer id) throws UserNotFoundException {
         ArrayList<User> friendList = new ArrayList<>();
         Set<Integer> friends = storage.getUserByID(id).getFriends();
-        friends.forEach(friendId -> friendList.add(storage.getStorage().get(friendId)));
+        friends.forEach(friendId -> friendList.add(storage.getUserByID(friendId)));
         return friendList;
     }
 
