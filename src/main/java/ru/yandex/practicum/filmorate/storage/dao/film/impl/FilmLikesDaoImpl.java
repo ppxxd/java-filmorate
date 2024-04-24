@@ -12,7 +12,7 @@ public class FilmLikesDaoImpl implements FilmLikesDao {
 
     @Override
     public void like(Integer id, Integer userId) {
-        String sql = "INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)";
+        String sql = "MERGE INTO film_likes (film_id, user_id) VALUES (?, ?)";
         jdbcTemplate.update(sql, id, userId);
     }
 

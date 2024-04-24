@@ -59,7 +59,6 @@ public class UserController {
     @GetMapping("/{id}/friends")
     public List<User> getUserFriends(@PathVariable int id) throws UserNotFoundException {
         log.info("Получен запрос GET /users/{id}/friends. Получен список друзей пользователя {}.", id);
-        System.out.println(userService.getUserFriends(id) + " " + id);
         return userService.getUserFriends(id);
     }
 
