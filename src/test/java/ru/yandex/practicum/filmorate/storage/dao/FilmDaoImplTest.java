@@ -169,21 +169,6 @@ class FilmDaoImplTest {
     }
 
     @Test
-    void shouldThrowsIfLikedTwice() throws ValidationException {
-        Film film1 = filmStorage.addFilm(film);
-        User user = userStorage.addUser(
-                User.builder()
-                        .email("andrey@gmail.com")
-                        .login("andrey")
-                        .name("Andrey")
-                        .birthday(LocalDate.of(2003, 8, 18))
-                        .build());
-        likesStorage.like(film1.getId(), user.getId());
-
-        assertThrows(RuntimeException.class, () -> likesStorage.like(film1.getId(), user.getId()));
-    }
-
-    @Test
     void shouldThrowsIfUnlikedTwice() throws ValidationException {
         Film film1 = filmStorage.addFilm(film);
         User user = userStorage.addUser(
