@@ -6,25 +6,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.service.UserServiceDAL;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @Slf4j
 @RequestMapping("/users")
 public class UserController {
-    private final UserService userService;
+    private final UserServiceDAL userService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserServiceDAL userService) {
         this.userService = userService;
     }
 
     @PostMapping
     public User add(@Valid @RequestBody User user) {
-        log.info("Получен запрос POST /users. Пользователь с id {} добавлен.", userService.getId());
+        log.info("Получен запрос POST /users. Пользователь добавлен.");
         return userService.createUser(user);
     }
 
@@ -38,7 +39,7 @@ public class UserController {
     @GetMapping
     public List<User> findAll() {
         log.info("Получен запрос GET /users.");
-        return userService.findAll();
+        return userService.getUsers();
     }
 
     @PutMapping("/{id}/friends/{friendID}")
@@ -62,10 +63,10 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getUserMutualFriends(@PathVariable int id, @PathVariable int otherId)
+    public Set<User> getUserMutualFriends(@PathVariable int id, @PathVariable int otherId)
             throws UserNotFoundException {
         log.info("Получен запрос GET /users/{id}/friends/common/{otherId}. " +
                 "Получен список общих друзей пользователя {} с пользователем {}.", id, otherId);
-        return userService.getMutualFriendsList(id, otherId);
+        return userService.getMutualFriends(id, otherId);
     }
 }

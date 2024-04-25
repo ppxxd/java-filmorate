@@ -1,16 +1,15 @@
 package ru.yandex.practicum.filmorate.storage.interfaces;
 
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 public interface FilmStorage {
 
-    Map<Integer, Film> getStorage();
-
-    Film addFilm(Film film);
+    Film addFilm(Film film) throws ValidationException;
 
     Film updateFilm(Film film);
 
@@ -19,4 +18,8 @@ public interface FilmStorage {
     Film getFilmByID(Integer id) throws FilmNotFoundException;
 
     Set<Integer> getFilmLikes(Integer id);
+
+    List<Film> getFilms();
+
+    List<Film> getMostPopularFilms(Integer count);
 }

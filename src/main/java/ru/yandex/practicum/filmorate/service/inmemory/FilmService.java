@@ -1,6 +1,7 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.service.inmemory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
@@ -11,9 +12,7 @@ import ru.yandex.practicum.filmorate.storage.interfaces.FilmStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
@@ -24,7 +23,7 @@ public class FilmService {
     private static final LocalDate FIRST_FILM_RELEASE = LocalDate.of(1895, 12, 28);
 
     @Autowired
-    public FilmService(FilmStorage storage, UserService userService) {
+    public FilmService(@Qualifier("inMemoryFilmStorage") FilmStorage storage, UserService userService) {
         this.storage = storage;
         this.userService = userService;
     }
@@ -48,13 +47,11 @@ public class FilmService {
     }
 
     public List<Film> getMostPopular(int count) {
-        return storage.getStorage().values().stream()
-                .sorted(Comparator.comparingInt(Film::getLikesAmount).reversed())
-                .limit(count).collect(Collectors.toList());
+        return storage.getMostPopularFilms(count);
     }
 
     public  Film createFilm(Film film) throws ValidationException {
-        if (storage.getStorage().containsKey(film.getId())) {
+        if (storage.getFilmByID(film.getId()) == null) {
             throw new ValidationException("Фильм с таким id уже существует.");
         }
         if (film.getReleaseDate().isBefore(FIRST_FILM_RELEASE)) {
@@ -65,13 +62,13 @@ public class FilmService {
     }
 
     public  Film updateFilm(Film film) throws FilmNotFoundException {
-        if (!storage.getStorage().containsKey(film.getId())) {
+        if (storage.getFilmByID(film.getId()) == null) {
             throw new FilmNotFoundException("Фильма с таким id не существует.");
         }
         return storage.updateFilm(film);
     }
 
     public List<Film> findAll() {
-        return new ArrayList<>(storage.getStorage().values());
+        return new ArrayList<>(storage.getFilms());
     }
 }

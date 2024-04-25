@@ -3,12 +3,9 @@ package ru.yandex.practicum.filmorate.storage.interfaces;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
 
 public interface UserStorage {
-
-    Map<Integer, User> getStorage();
 
     User addUser(User user);
 
@@ -18,5 +15,7 @@ public interface UserStorage {
 
     User getUserByID(Integer id) throws UserNotFoundException;
 
-    Set<Integer> getUserFriends(Integer id);
+    List<User> getUserFriends(Integer id);
+
+    List<User> getUsers();
 }
